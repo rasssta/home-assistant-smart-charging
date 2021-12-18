@@ -9,18 +9,15 @@ template:
         {% set charge_hours = (( charge_limit - current_soc ) / 100 * battery_kwh / charge_kw)|round|int %}
         {%- set data = 
         state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_today')|selectattr('start', '>=', (now()))|sort(attribute='value') +
-        state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|sort(attribute='value')
+        state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|rejectattr('value', 'eq', None)|list|sort(attribute='value')
         %}
         {%- set l=data|sort(attribute='value') %}
-
         {%- set ns = namespace(status=[]) %}
-
         {%- for i in range(charge_hours) %}
           {% if l[i].start|string|as_timestamp | timestamp_custom("%Y-%m-%d %H", True, "%Y-%m-%d %H") == (now()|string)|as_timestamp | timestamp_custom("%Y-%m-%d %H", True, "%Y-%m-%d %H") %}
             {%- set ns.status = "yes" %}
           {%- endif %}
         {%- endfor %}
-
         {% if ns.status == "yes" %}
           True
         {% else %}
