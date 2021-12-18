@@ -16,7 +16,13 @@ state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|rejectatt
 
 {%- set ns = namespace(list_of_hours=[]) %}
 
-{%- for i in range(charge_hours) %}
+{%- if l|list|count < charge_hours %}
+  {%- set range_hours = l|list|count %}
+{%- else %}
+  {%- set range_hours = charge_hours %}
+{%- endif %}
+
+{%- for i in range(range_hours) %}
   {%- if now() <= l[i].start %}  
     {%- set ns.list_of_hours = ns.list_of_hours + [(l[i].start|string)|as_timestamp|timestamp_custom("%Y-%m-%d %H:%M", True, "%Y-%m-%d %H:%M")] %}
   {%- endif %}
