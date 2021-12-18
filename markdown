@@ -9,7 +9,7 @@ Charge during:
 
 {%- set data = 
 state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_today')|selectattr('start', '>=', (now()))|sort(attribute='value') +
-state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|sort(attribute='value')
+state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|rejectattr('value', 'eq', None)|list|sort(attribute='value')
 %}
 
 {%- set l=data|sort(attribute='value') %}
