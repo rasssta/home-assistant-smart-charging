@@ -18,12 +18,10 @@ state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|sort(attr
 
 {%- for i in range(charge_hours) %}
   {%- if now() <= l[i].start %}  
-    {%- set ns.list_of_hours = ns.list_of_hours + [(l[i].start|string)|as_timestamp|timestamp_custom("%Y-%m-%d %H:%M")] %}
+    {%- set ns.list_of_hours = ns.list_of_hours + [(l[i].start|string)|as_timestamp|timestamp_custom("%Y-%m-%d %H:%M", True, "%Y-%m-%d %H:%M")] %}
   {%- endif %}
 {%- endfor %}
 
 {%- for hour in ns.list_of_hours | sort %}
-  {{ hour }} - {{ (as_timestamp(hour) + 3600)|timestamp_custom("%Y-%m-%d %H:%M") }}  
+  {{ hour }} - {{ (as_timestamp(hour) + 3600)|timestamp_custom("%Y-%m-%d %H:%M", True, "%Y-%m-%d %H:%M") }}  
 {%- endfor %}
-
-
