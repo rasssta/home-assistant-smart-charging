@@ -6,25 +6,32 @@ template:
         {% set battery_kwh = 69 %}
         {% set charge_limit = states.sensor.tesla_charge_limit_soc.state|int %} 
         {% set current_soc = states.sensor.tesla_battery_level.state|int %}
+        {% set location = states.sensor.tesla_geofence.state %}
+        {% set cable_status = states.binary_sensor.tesla_plugged_in.state %}
         {% set charge_hours = (( charge_limit - current_soc ) / 100 * battery_kwh / charge_kw)|round|int %}
-        {%- set data = 
-        state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_today')|selectattr('start', '>=', (now()))|sort(attribute='value') +
-        state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|rejectattr('value', 'eq', None)|list|sort(attribute='value')
-        %}
-        {%- set l=data|sort(attribute='value') %}
-        {%- set ns = namespace(status=[]) %}
-        {%- if l|list|count < charge_hours %}
-           {%- set range_hours = l|list|count %}
-         {%- else %}
-           {%- set range_hours = charge_hours %}
-        {%- endif %}
-        {%- for i in range(range_hours) %}
-          {% if l[i].start|string|as_timestamp | timestamp_custom("%Y-%m-%d %H", True, "%Y-%m-%d %H") == (now()|string)|as_timestamp | timestamp_custom("%Y-%m-%d %H", True, "%Y-%m-%d %H") %}
-            {%- set ns.status = "yes" %}
+
+        {% if (charge_hours != 0 and location == "Landet" and cable_status == "on") %}
+          {%- set data = 
+          state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_today')|selectattr('start', '>=', (now()))|sort(attribute='value') +
+          state_attr('sensor.nordpool_kwh_se3_sek_3_10_025', 'raw_tomorrow')[:8]|rejectattr('value', 'eq', None)|list|sort(attribute='value')
+          %}
+          {%- set l=data|sort(attribute='value') %}
+          {%- set ns = namespace(status=[]) %}
+          {%- if l|list|count < charge_hours %}
+             {%- set range_hours = l|list|count %}
+           {%- else %}
+             {%- set range_hours = charge_hours %}
           {%- endif %}
-        {%- endfor %}
-        {% if ns.status == "yes" %}
-          True
+          {%- for i in range(range_hours) %}
+            {% if l[i].start|string|as_timestamp | timestamp_custom("%Y-%m-%d %H", True, "%Y-%m-%d %H") == (now()|string)|as_timestamp | timestamp_custom("%Y-%m-%d %H", True, "%Y-%m-%d %H") %}
+              {%- set ns.status = "yes" %}
+            {%- endif %}
+          {%- endfor %}
+          {% if ns.status == "yes" %}
+            True
+          {% else %}
+            False
+          {% endif %}
         {% else %}
           False
         {% endif %}
