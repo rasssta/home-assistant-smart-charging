@@ -1,4 +1,8 @@
-{% set charge_kw = 3.7 %}
+{% if (states.sensor.average_available_ampere_on_grid_over_last_4_hours.state|int * 3 * 230 / 1000) >= 3 %}
+  {% set charge_kw = (states.sensor.average_available_ampere_on_grid_over_last_4_hours.state|int * 3 * 230 / 1000) %}
+{% else %}
+  {% set charge_kw = 3 %}
+{% endif %}
 {% set battery_kwh = 69 %}
 {% set charge_limit = states.sensor.tesla_charge_limit_soc.state|int %} 
 {% set current_soc = states.sensor.tesla_battery_level.state|int %}
