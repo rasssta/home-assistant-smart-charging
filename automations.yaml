@@ -1,0 +1,26 @@
+- id: 'easee_enable_idle_current'
+  alias: Easee - Enable idle current on low energy price
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.<spot_price_sensor>
+    below: '1'
+  condition: []
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.<easee>_enable_idle_current
+  mode: single
+- id: 'easee_disable_idle_current'
+  alias: Easee - Disable idle current on high energy price
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.<spot_price_sensor>
+    above: '1'
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.<easee>_enable_idle_current
+  mode: single
