@@ -9,7 +9,7 @@
 {% set location = states.sensor.tesla_geofence.state %}
 {% set car_type = states.input_select.electric_car_type.state %}
 {% set tesla_cable_status = states.binary_sensor.tesla_plugged_in.state %}
-{% if states.sensor.easee_home_44981_status.state != 'disconnected' %}
+{% if states.sensor.easee_<custom>_status.state != 'disconnected' %}
   {% set easee_cable_status = 'on' %}
 {% else %}
   {% set easee_cable_status = 'off' %}
