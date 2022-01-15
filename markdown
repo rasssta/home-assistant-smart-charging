@@ -8,7 +8,7 @@
 {% set current_soc = states.sensor.tesla_battery_level.state|int %}
 {% set location = states.sensor.tesla_geofence.state %}
 {% set cable_status = states.binary_sensor.tesla_plugged_in.state %}
-{% set charge_hours = (( charge_limit - current_soc ) / 100 * battery_kwh / charge_kw)|round|int %}
+{% set charge_hours = (( charge_limit - current_soc ) / 100 * battery_kwh / charge_kw)|round(0,'ceil')|int %}
 
 {% if (charge_hours != 0 and location == "Landet" and cable_status == "on") %}
   Need to charge {{ (( charge_limit - current_soc ) / 100 * battery_kwh)|float|round(2)  }} kWh in {{ charge_hours }} hours (Avg: {{charge_kw}} kW)
